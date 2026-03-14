@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <title>Huroof Hero</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1CB0F6">
+
+    <style>
+        /* Basis Duolingo-stijl styling */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            color: #3c3c3c;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        header {
+            background-color: #1CB0F6; /* Duolingo blauw */
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        main {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .lesson-btn {
+            background-color: #58CC02; /* Duolingo groen */
+            color: white;
+            border: none;
+            border-radius: 15px;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            box-shadow: 0 4px 0 #58a700;
+            cursor: pointer;
+            width: 80%;
+            max-width: 300px;
+            margin-bottom: 20px;
+        }
+        .lesson-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        Huroof Hero
+    </header>
+
+    <main>
+        <h2>Welkom terug!</h2>
+        <p>Klaar voor je volgende les?</p>
+        
+        <button class="lesson-btn">Start Les 1: Alfabet</button>
+        <button class="lesson-btn" style="background-color: #cecece; box-shadow: 0 4px 0 #a5a5a5;">Les 2: Fatiha (Gesloten)</button>
+    </main>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker succesvol geregistreerd met scope: ', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registratie mislukt: ', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

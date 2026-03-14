@@ -1,0 +1,21 @@
+{
+  "name": "Huroof Hero",
+  "short_name": "Huroof Hero",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1CB0F6",
+  "description": "Leer de Qur'an, het Arabische alfabet en de betekenis op een interactieve manier.",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
