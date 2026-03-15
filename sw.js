@@ -1,12 +1,11 @@
 const CACHE_NAME = 'huroof-hero-v1';
 const assetsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json'
-  // Later voegen we hier CSS, afbeeldingen en geluidsbestanden toe
+  './',
+  './index.html',
+  './manifest.json'
 ];
 
-// Installeer de Service Worker en sla bestanden op in de cache
+// Installeer Service Worker en cache bestanden
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -16,7 +15,7 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Haal bestanden uit de cache als er geen internet is
+// Netwerkverzoeken afhandelen (offline support)
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
