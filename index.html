@@ -4,201 +4,250 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Huroof Hero</title>
-    
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#1CB0F6">
 
     <style>
-        /* Basis Styling (Duolingo Stijl) */
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #ffffff;
-            color: #3c3c3c;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            touch-action: none; /* Voorkomt scrollen tijdens het tekenen op mobiel */
+            margin: 0; padding: 0;
+            background-color: #ffffff; color: #3c3c3c;
+            display: flex; flex-direction: column; height: 100vh;
+            touch-action: none;
         }
+        
+        /* Header & Progress Bar */
         header {
-            background-color: #1CB0F6;
-            color: white;
-            padding: 15px 20px;
-            text-align: center;
-            font-size: 1.4rem;
-            font-weight: bold;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        main {
-            flex: 1;
             padding: 20px;
             display: flex;
-            flex-direction: column;
             align-items: center;
+            gap: 15px;
         }
-        h2 {
-            margin-top: 0;
-            color: #4b4b4b;
-        }
-        
-        /* Canvas Container */
-        .canvas-container {
-            position: relative;
-            width: 300px;
-            height: 300px;
-            background: #f7f7f7;
-            border-radius: 20px;
-            border: 3px dashed #1CB0F6;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .progress-bg {
+            flex: 1;
+            background-color: #e5e5e5;
+            height: 16px;
+            border-radius: 8px;
             overflow: hidden;
         }
-        
-        /* De lichtgrijze letter om over te trekken */
-        .trace-letter {
-            position: absolute;
-            font-size: 220px;
-            color: #e5e5e5;
-            user-select: none;
-            z-index: 0;
-        }
-
-        /* Het daadwerkelijke tekenveld */
-        canvas {
-            position: relative;
-            z-index: 1;
-            cursor: crosshair;
-        }
-
-        /* Knoppen */
-        .button-group {
-            display: flex;
-            gap: 15px;
-            width: 100%;
-            max-width: 300px;
-        }
-        .lesson-btn {
-            flex: 1;
-            color: white;
-            border: none;
-            border-radius: 15px;
-            padding: 15px 0;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-        .lesson-btn:active {
-            transform: translateY(4px);
-            box-shadow: none !important;
-        }
-        .btn-clear {
-            background-color: #ff4b4b;
-            box-shadow: 0 4px 0 #ea2b2b;
-        }
-        .btn-check {
+        .progress-fill {
             background-color: #58CC02;
-            box-shadow: 0 4px 0 #58a700;
+            height: 100%;
+            width: 0%; /* Begint op 0 */
+            transition: width 0.3s ease-in-out;
+            border-radius: 8px;
         }
+        
+        main {
+            flex: 1; padding: 20px;
+            display: flex; flex-direction: column;
+            align-items: center; text-align: center;
+        }
+        h2 { margin-top: 0; color: #4b4b4b; }
+
+        /* Oefening Containers */
+        #app-container { width: 100%; max-width: 400px; }
+        
+        /* Canvas Styling */
+        .canvas-container {
+            position: relative; width: 300px; height: 300px;
+            background: #f7f7f7; border-radius: 20px; border: 3px dashed #1CB0F6;
+            margin: 0 auto 20px auto; display: flex;
+            justify-content: center; align-items: center; overflow: hidden;
+        }
+        .trace-letter { position: absolute; font-size: 220px; color: #e5e5e5; z-index: 0; user-select: none; }
+        canvas { position: relative; z-index: 1; cursor: crosshair; }
+
+        /* Multiple Choice Styling */
+        .choice-btn {
+            background-color: #ffffff;
+            border: 2px solid #e5e5e5;
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 2rem;
+            width: 100%;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #1CB0F6;
+        }
+        .choice-btn:hover { background-color: #f0f9ff; border-color: #1CB0F6; }
+        .choice-btn.selected { background-color: #ddf4ff; border-color: #1CB0F6; box-shadow: 0 4px 0 #1CB0F6; transform: translateY(-2px); }
+
+        /* Navigatie Knoppen */
+        .bottom-bar { padding: 20px; width: 100%; max-width: 400px; margin: 0 auto; }
+        .lesson-btn {
+            width: 100%; color: white; border: none; border-radius: 15px;
+            padding: 15px 0; font-size: 1.2rem; font-weight: bold; cursor: pointer;
+            background-color: #58CC02; box-shadow: 0 4px 0 #58a700;
+        }
+        .lesson-btn:active { transform: translateY(4px); box-shadow: none; }
+        .lesson-btn:disabled { background-color: #e5e5e5; box-shadow: none; color: #afafaf; cursor: not-allowed; transform: none; }
+
+        /* Resultaat Scherm */
+        .result-gem { font-size: 4rem; margin: 20px 0; }
+        .result-text { font-size: 1.5rem; font-weight: bold; color: #ffc800; }
     </style>
 </head>
 <body>
 
     <header>
-        Huroof Hero
+        <span style="font-size: 1.5rem; cursor: pointer;">❌</span>
+        <div class="progress-bg">
+            <div class="progress-fill" id="progress-bar"></div>
+        </div>
     </header>
 
     <main>
-        <h2>Practice: Alif (أ)</h2>
-        <p>Trace the letter below:</p>
-        
-        <div class="canvas-container">
-            <div class="trace-letter">أ</div>
-            <canvas id="drawingCanvas" width="300" height="300"></canvas>
-        </div>
-
-        <div class="button-group">
-            <button class="lesson-btn btn-clear" onclick="clearCanvas()">Clear</button>
-            <button class="lesson-btn btn-check" onclick="alert('Goed gedaan! Op naar de volgende letter.')">Check</button>
-        </div>
+        <div id="app-container">
+            </div>
     </main>
 
+    <div class="bottom-bar">
+        <button id="check-btn" class="lesson-btn" onclick="checkAnswer()">Check</button>
+    </div>
+
     <script>
-        const canvas = document.getElementById('drawingCanvas');
-        const ctx = canvas.getContext('2d');
-        let drawing = false;
+        // 1. Onze "Database" voor deze les
+        const lessonData = [
+            { type: 'draw', letter: 'أ', title: 'Alif', instruction: 'Teken de letter Alif:' },
+            { type: 'choice', instruction: 'Welke letter is Ba?', options: ['ت', 'ب', 'أ'], correct: 'ب' },
+            { type: 'choice', instruction: 'Welke letter is Ta?', options: ['ث', 'ب', 'ت'], correct: 'ت' }
+        ];
 
-        // Pen instellingen
-        ctx.lineWidth = 12;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.strokeStyle = '#3c3c3c'; // Donkergrijze inkt
+        // 2. Status van de app
+        let currentStep = 0;
+        let selectedOption = null;
+        const appContainer = document.getElementById('app-container');
+        const progressBar = document.getElementById('progress-bar');
+        const checkBtn = document.getElementById('check-btn');
 
-        function getMousePos(canvas, evt) {
-            const rect = canvas.getBoundingClientRect();
-            // Bepaal of het touch of muis is
-            const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
-            const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
-            return {
-                x: clientX - rect.left,
-                y: clientY - rect.top
-            };
+        // 3. Render (teken) de huidige stap op het scherm
+        function renderStep() {
+            selectedOption = null; // Reset selectie
+            checkBtn.innerText = 'Check';
+            checkBtn.disabled = false;
+
+            // Update voortgangsbalk
+            const progressPercentage = (currentStep / lessonData.length) * 100;
+            progressBar.style.width = progressPercentage + '%';
+
+            // Is de les klaar?
+            if (currentStep >= lessonData.length) {
+                renderEndScreen();
+                return;
+            }
+
+            const currentExercise = lessonData[currentStep];
+
+            if (currentExercise.type === 'draw') {
+                appContainer.innerHTML = `
+                    <h2>Practice: ${currentExercise.title}</h2>
+                    <p>${currentExercise.instruction}</p>
+                    <div class="canvas-container">
+                        <div class="trace-letter">${currentExercise.letter}</div>
+                        <canvas id="drawingCanvas" width="300" height="300"></canvas>
+                    </div>
+                `;
+                initCanvas(); // Activeer de tekenfunctie
+            } 
+            else if (currentExercise.type === 'choice') {
+                checkBtn.disabled = true; // Knop uit tot een optie gekozen is
+                let optionsHtml = currentExercise.options.map(opt => 
+                    `<button class="choice-btn" onclick="selectOption(this, '${opt}')">${opt}</button>`
+                ).join('');
+
+                appContainer.innerHTML = `
+                    <h2>Lezen</h2>
+                    <p>${currentExercise.instruction}</p>
+                    ${optionsHtml}
+                `;
+            }
         }
 
-        function startDrawing(e) {
-            e.preventDefault(); // Voorkomt scrollen op mobiel
-            drawing = true;
-            const pos = getMousePos(canvas, e);
-            ctx.beginPath();
-            ctx.moveTo(pos.x, pos.y);
-            draw(e);
+        // 4. Optie selecteren bij meerkeuze
+        function selectOption(btnElement, option) {
+            // Verwijder 'selected' class van alle knoppen
+            document.querySelectorAll('.choice-btn').forEach(btn => btn.classList.remove('selected'));
+            // Voeg class toe aan gekozen knop
+            btnElement.classList.add('selected');
+            selectedOption = option;
+            checkBtn.disabled = false; // Zet Check knop aan
         }
 
-        function stopDrawing(e) {
-            e.preventDefault();
-            drawing = false;
-            ctx.beginPath();
+        // 5. Antwoord controleren en doorgaan
+        function checkAnswer() {
+            if (currentStep >= lessonData.length) {
+                // Herstart de app tijdelijk voor testing
+                currentStep = 0;
+                renderStep();
+                return;
+            }
+
+            const currentExercise = lessonData[currentStep];
+
+            if (currentExercise.type === 'draw') {
+                // Voor nu keuren we tekenen altijd goed
+                currentStep++;
+                renderStep();
+            } 
+            else if (currentExercise.type === 'choice') {
+                if (selectedOption === currentExercise.correct) {
+                    // Goed antwoord!
+                    currentStep++;
+                    renderStep();
+                } else {
+                    alert('Dat is niet helemaal juist. Probeer het nog eens!');
+                    // Bij een fout antwoord kun je later hartjes aftrekken (zoals Duolingo)
+                }
+            }
         }
 
-        function draw(e) {
-            if (!drawing) return;
-            e.preventDefault();
-            const pos = getMousePos(canvas, e);
-            ctx.lineTo(pos.x, pos.y);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(pos.x, pos.y);
+        // 6. Eindscherm tonen
+        function renderEndScreen() {
+            progressBar.style.width = '100%'; // Balk vol
+            appContainer.innerHTML = `
+                <h2>Les Voltooid!</h2>
+                <div class="result-gem">💎</div>
+                <p class="result-text">+10 Gems</p>
+                <p>Masha'Allah, je hebt 3 oefeningen afgerond. Herhaling maakt perfect!</p>
+            `;
+            checkBtn.innerText = 'Terug naar menu';
         }
 
-        // Muis events
-        canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseout', stopDrawing);
+        // --- Canvas Logica (Geïsoleerd zodat het werkt bij opnieuw inladen) ---
+        function initCanvas() {
+            const canvas = document.getElementById('drawingCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
 
-        // Touch events (voor smartphones/tablets)
-        canvas.addEventListener('touchstart', startDrawing, { passive: false });
-        canvas.addEventListener('touchend', stopDrawing, { passive: false });
-        canvas.addEventListener('touchmove', draw, { passive: false });
+            ctx.lineWidth = 12; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#3c3c3c';
 
-        function clearCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            function getMousePos(canvas, evt) {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+                const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+                return { x: clientX - rect.left, y: clientY - rect.top };
+            }
+
+            function startDrawing(e) { e.preventDefault(); drawing = true; const pos = getMousePos(canvas, e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); draw(e); }
+            function stopDrawing(e) { e.preventDefault(); drawing = false; ctx.beginPath(); }
+            function draw(e) {
+                if (!drawing) return; e.preventDefault();
+                const pos = getMousePos(canvas, e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
+            }
+
+            canvas.addEventListener('mousedown', startDrawing); canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mousemove', draw); canvas.addEventListener('mouseout', stopDrawing);
+            canvas.addEventListener('touchstart', startDrawing, { passive: false });
+            canvas.addEventListener('touchend', stopDrawing, { passive: false });
+            canvas.addEventListener('touchmove', draw, { passive: false });
         }
 
-        // Service Worker Registratie voor PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('ServiceWorker registered!', reg))
-                    .catch(err => console.log('ServiceWorker failed: ', err));
-            });
-        }
+        // Start de app!
+        renderStep();
     </script>
 </body>
 </html>
